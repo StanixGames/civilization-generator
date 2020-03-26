@@ -1,0 +1,13 @@
+.nation-label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.nation-icon {
+  width: 30px;
+  height: 30px;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}

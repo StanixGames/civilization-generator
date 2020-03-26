@@ -5,7 +5,7 @@ export enum Nation {
   austrian = 'austrian',
   aztec = 'aztec',
   babylonian = 'babylonian',
-  brazilian = 'brazilian',
+  brazilian = 'brazilian', 
   byzantine = 'byzantine',
   carthaginian = 'carthaginian',
   celtic = 'celtic',
