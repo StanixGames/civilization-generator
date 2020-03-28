@@ -5,33 +5,32 @@ import Container from '@material-ui/core/Container';
 
 import {UserCard} from '../../../components';
 import {users} from '../../../store';
+import {UserShort} from '../../../types';
 
 import {useStyles} from './styles';
 
-const getUsersCount = async (onSetUsersCount: (number: number) => void) => {
-  const nextUsersCount = await users.getSize();
-  onSetUsersCount(nextUsersCount);
-}
-
 export function Players() {
   const classes = useStyles();
-  const [usersCount, setUsersCount] = useState<number>(0);
+  const [players, setPlayers] = useState<UserShort[]>([]);
 
   useEffect(() => {
-    //getUsersCount(setUsersCount);
+    users
+      .getAll()
+      .then((users) => {
+        setPlayers(users);
+      });
   }, []);
 
   return (
     <Container component="main">
       <CssBaseline />
-      <Typography>Registered users: {usersCount}</Typography>
+      <Typography>Registered users: {players.length}</Typography>
       <div className={classes.paper}>
-        <UserCard nickName="Test" />
-        <UserCard nickName="Test" />
-        <UserCard nickName="Test" />
-        <UserCard nickName="Test" />
-        <UserCard nickName="Test" />
-        <UserCard nickName="Test" />
+        {players.map((player: UserShort) => (
+          <UserCard
+            data={player}
+          />
+        ))}
       </div>
     </Container>
   );

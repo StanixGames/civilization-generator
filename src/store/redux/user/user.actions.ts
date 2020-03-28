@@ -1,17 +1,19 @@
+import {AuthStatus, UserShort} from '../../../types';
 import {
   UserTypes,
   UserActionTypes
 } from './user.types';
 
-export const tokenSet = (token: string): UserActionTypes => {
+export const authStatusSet = (status: AuthStatus): UserActionTypes => {
   return {
-    type: UserTypes.TOKEN_SET,
-    token,
+    type: UserTypes.AUTH_STATUS_SET,
+    status,
   }
 };
 
-export const tokenRemove = (): UserActionTypes => {
+export const userDataSet = (data: UserShort): UserActionTypes => {
   return {
-    type: UserTypes.TOKEN_REMOVE,
+    type: UserTypes.DATA_SET,
+    data,
   }
-};
+}

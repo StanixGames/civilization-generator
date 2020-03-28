@@ -1,19 +1,25 @@
+import {AuthStatus, UserShort} from '../../../types';
+
 export const UserTypes = {
-  TOKEN_SET: 'TOKEN_SET',
-  TOKEN_REMOVE: 'TOKEN_REMOVE',
+  AUTH_STATUS_SET: 'AUTH_STATUS_SET',
+  DATA_SET: 'DATA_SET',
 };
 
-export interface SetTokenAction {
-  type: typeof UserTypes.TOKEN_SET
-  token: string;
+export interface AuthStatusSetAction {
+  type: typeof UserTypes.AUTH_STATUS_SET
+  status: AuthStatus;
 }
 
-interface RemoveTokenAction {
-  type: typeof UserTypes.TOKEN_REMOVE
+export interface UserDataSetAction {
+  type: typeof UserTypes.DATA_SET;
+  data: UserShort;
 }
 
 export interface UserState {
-  token: string | null;
+  status: AuthStatus;
+  data: UserShort | null;
 }
 
-export type UserActionTypes = SetTokenAction | RemoveTokenAction
+export type UserActionTypes =
+  | AuthStatusSetAction
+  | UserDataSetAction;

@@ -1,0 +1,6 @@
+export enum AuthStatus {
+  NONE = 'NONE',
+  FETCHING = 'FETCHING',
+  AUTHORIZED = 'AUTHORIZED',
+  NOT_AUTHORIZED = 'NOT_AUTHORIZED'
+};

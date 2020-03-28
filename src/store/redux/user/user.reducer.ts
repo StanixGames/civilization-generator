@@ -1,27 +1,30 @@
-// src/store/chat/reducers.ts
+import {AuthStatus} from '../../../types';
 import {
   UserState, 
   UserTypes, 
   UserActionTypes,
-  SetTokenAction,
+  AuthStatusSetAction,
+  UserDataSetAction,
 } from './user.types';
 
 const initState: UserState = {
-  token: null,
+  status: AuthStatus.NONE,
+  data: null,
 }
 
 export const userReducer = (state = initState, action: UserActionTypes): UserState => {
   switch (action.type) {
-    case UserTypes.TOKEN_REMOVE:
+    case UserTypes.AUTH_STATUS_SET:
+      const {status} = action as AuthStatusSetAction;
       return {
         ...state,
-        token: null,
-      };
-    case UserTypes.TOKEN_SET:
-      const {token} = action as SetTokenAction;
+        status,
+      }
+    case UserTypes.DATA_SET:
+      const {data} = action as UserDataSetAction;
       return {
         ...state,
-        token,
+        data,
       }
     default:
       return state;

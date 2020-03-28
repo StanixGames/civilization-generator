@@ -1,44 +1,60 @@
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
 import {useEffect} from 'react';
-import {useSelector, useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {useHistory, useLocation} from "react-router-dom";
+
+import {AuthStatus, UserShort} from '../types';
+import {authStatusSet, userDataSet} from '../store/redux/user';
 import {State} from '../store/redux';
-import {tokenSet} from '../store/redux/user';
+import {users} from '../store';
 
-export type SessionHook = [ boolean ];
+export type SessionHook = [ AuthStatus ];
 
-let prevToken: string | null = '';
+let firebaseAuthListenerSetup = false;
+let prevAuthStatus: AuthStatus = AuthStatus.FETCHING;
 
 export const useSession = (): SessionHook => {
   const history = useHistory();
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const token = useSelector<State, string | null>((state) => state.user.token);
-  if (!token) {
-    const localToken = localStorage.getItem('token');
-    if (localToken) {
-      dispatch(tokenSet(localToken));
-    }
-  } else {
-    const localToken = localStorage.getItem('token');
-    if (!localToken) {
-      localStorage.setItem('token', token);
-    }
+  if (!firebaseAuthListenerSetup) {
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.log('user', user, user.displayName);
+        dispatch(authStatusSet(AuthStatus.AUTHORIZED));
+        
+        if (user.email) {
+          users.getDataByEmail(user.email)
+            .then((userData: UserShort | null) => {
+              if (userData) {
+                dispatch(userDataSet(userData));
+              }
+            });
+        }
+      } else {
+        console.log('LOGOUT IS');
+        dispatch(authStatusSet(AuthStatus.NOT_AUTHORIZED));
+      }
+    });
+
+    firebaseAuthListenerSetup = true;
   }
-  const authorized = !!token;
+
+  const status = useSelector<State, AuthStatus>((state) => state.user.status);
 
   useEffect(() => {
-    if (token !== prevToken) {
-      console.log('tokens', token, prevToken);
-      prevToken = token;
+    if (status !== prevAuthStatus) {
+      prevAuthStatus = status;
 
-      if (token) {
+      if (status === AuthStatus.AUTHORIZED) {
         let path = location.pathname;
-        if (path === '/signin' || path === '/signup') {
+        if (path === '/signin' || path === '/signup' || path === '' || path === '/') {
           path = '/home';
         }
         history.push(path);
-      } else {
+      } else if (status === AuthStatus.NOT_AUTHORIZED) {
         const path = location.pathname;
         if (path === '/signin' || path === '/signup') {
           history.push(path);
@@ -47,9 +63,9 @@ export const useSession = (): SessionHook => {
         }
       }
     }
-  }, [token, history]);
+  }, [status, history]);
 
   return [
-    authorized,
+    status,
   ];
 }

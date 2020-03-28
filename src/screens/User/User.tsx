@@ -14,6 +14,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import Container from '@material-ui/core/Container';
 import Link from '@material-ui/core/Link';
+import Avatar from '@material-ui/core/Avatar';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
@@ -24,8 +25,9 @@ import {Home} from './Home';
 import {Players} from './Players';
 import {CreateDraft} from './CreateDraft';
 
-import {usePageTitle} from '../../hooks';
-import {tokenRemove} from '../../store/redux/user';
+import {usePageTitle, useUser} from '../../hooks';
+import {users} from '../../store';
+// import {tokenRemove} from '../../store/redux/user';
 // import {Page404} from './Page404';
 
 function Copyright() {
@@ -81,6 +83,12 @@ const useStyles = makeStyles((theme) => ({
   title: {
     flexGrow: 1,
   },
+  userNameHeader: {
+    marginRight: 10,
+  },
+  userAvatarHeader: {
+    marginRight: 7,
+  },
   drawerPaper: {
     position: 'relative',
     whiteSpace: 'nowrap',
@@ -127,6 +135,11 @@ export function User() {
   const dispatch = useDispatch();
   const [open, setOpen] = React.useState(true);
   const [pageTitle] = usePageTitle();
+  const userData = useUser();
+
+  const userName = userData ? userData.nickName : '';
+  const userAvatarUrl = userData ? userData.avatarUrl : '';
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -135,9 +148,9 @@ export function User() {
   };
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
-  const handleLogoutClick = useCallback(() => {
-    localStorage.removeItem('token');
-    dispatch(tokenRemove());
+  const handleLogoutClick = useCallback(async () => {
+    const logout = await users.logout();
+    console.log('logout', logout);
   }, [dispatch]);
 
   return (
@@ -156,6 +169,10 @@ export function User() {
           </IconButton>
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
             CivFans {pageTitle ? `| ${pageTitle}` : ''}
+          </Typography>
+          <Avatar alt={userName} src={userAvatarUrl} className={classes.userAvatarHeader} />
+          <Typography component="h2" variant="subtitle1" color="inherit" noWrap className={classes.userNameHeader}>
+            {userName}
           </Typography>
           <IconButton color="inherit">
             <Badge badgeContent={0} color="secondary">
