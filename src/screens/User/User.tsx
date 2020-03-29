@@ -206,8 +206,8 @@ export function User() {
         <Container maxWidth="lg" className={classes.container}>
 
             <Route exact path="/home" component={Home} />
-            <Route exact path="/players" component={Players} />
             <Route exact path="/draft" component={CreateDraft} />
+            <Route path="/players" component={Players} />
             {/* <Route component={Page404} /> */}
         </Container>
       </main>

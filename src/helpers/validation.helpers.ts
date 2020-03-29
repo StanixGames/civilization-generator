@@ -5,6 +5,12 @@ const SIGN_UP_RES_EMAIL_ERRORS = [
 const SIGN_UP_RES_PASSWORD_ERRORS = [
   'auth/weak-password',
 ];
+const SIGN_IN_RES_EMAIL_ERRORS = [
+  'auth/user-not-found',
+];
+const SIGN_IN_RES_PASSWORD_ERRORS = [
+  'auth/wrong-password',
+];
 
 /**
  * 
@@ -20,6 +26,19 @@ export const validateSignUpResponse = (code: string): string | null => {
     return 'email';
   }
   if (SIGN_UP_RES_PASSWORD_ERRORS.includes(code)) {
+    return 'password';
+  }
+  return null;
+}
+
+export const validateSignInResponse = (code: string): string | null => {
+  if (!code) {
+    return null;
+  }
+  if (SIGN_IN_RES_EMAIL_ERRORS.includes(code)) {
+    return 'email';
+  }
+  if (SIGN_IN_RES_PASSWORD_ERRORS.includes(code)) {
     return 'password';
   }
   return null;
@@ -42,6 +61,22 @@ export const validateSignUpBeforeRequest = (email: string, password: string, nic
     return {
       field: 'nickName',
       message: 'Too short nickName',
+    }
+  }
+  return null;
+}
+
+export const validateSignInBeforeRequest = (email: string, password: string): { field: string, message: string } | null => {
+  if (!email || email.length < 5) {
+    return {
+      field: 'email',
+      message: 'Too short email address',
+    }
+  }
+  if (!password || password.length < 6) {
+    return {
+      field: 'password',
+      message: 'Too short password',
     }
   }
   return null;

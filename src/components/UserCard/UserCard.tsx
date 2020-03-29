@@ -10,15 +10,19 @@ import {useStyles} from './styles';
 
 interface UserCardProps {
   data: UserShort;
+  onClick: () => void;
 }
 
 export const UserCard: React.FunctionComponent<UserCardProps> = (props): JSX.Element => {
   const classes = useStyles();
-  const {data: {nickName, avatarUrl}} = props;
+  const {
+    data: {nickName, avatarUrl},
+    onClick,
+  } = props;
 
   return (
     <Card className={classes.card}>
-      <CardActionArea>
+      <CardActionArea onClick={onClick}>
         <CardContent>
           <Avatar alt={nickName} src={avatarUrl} className={classes.avatar} />
           <Typography gutterBottom variant="subtitle1" component="div">

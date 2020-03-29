@@ -126,7 +126,7 @@ export const SettingsForm: React.FunctionComponent<SettingsFormProps> = (props) 
         aria-labelledby="discrete-slider"
         valueLabelDisplay="auto"
         step={null}
-        marks={MARKS}
+        marks={MARKS.slice(0, numberSlots)}
         max={numberSlots}
         onChange={handleChangeNumberPlayers}
       />

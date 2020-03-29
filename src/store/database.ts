@@ -16,7 +16,7 @@ firebase.initializeApp({
 
 export const db = firebase.firestore();
 
-interface RegisterResponse {
+interface AuthResponse {
   success: boolean;
   error?: {
     code: string;
@@ -25,7 +25,7 @@ interface RegisterResponse {
 }
 
 class Users {
-  async register(email: string, password: string, nickName: string): Promise<RegisterResponse> {
+  async register(email: string, password: string, nickName: string): Promise<AuthResponse> {
     return new Promise((resolve) => {
       firebase
         .auth()
@@ -67,16 +67,27 @@ class Users {
     });
   }
 
-  async login(email: string, password: string): Promise<boolean> {
-    try {
-      await firebase
+  async login(email: string, password: string): Promise<AuthResponse> {
+    return new Promise((resolve) => {
+      firebase
         .auth()
-        .signInWithEmailAndPassword(email, password);
-      return true;
-    } catch (e) {
-      console.log(e);
-      return false;
-    }
+        .signInWithEmailAndPassword(email, password)
+        .then((res) => {
+          resolve({ success: true });
+        })
+        .catch((e) => {
+          console.log(e);
+          const { code, message } = e;
+
+          resolve({
+            success: false,
+            error: {
+              code,
+              message,
+            }
+          });
+        })
+    });
   }
 
   async logout(): Promise<boolean> {

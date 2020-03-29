@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -10,15 +10,57 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 
+import {users} from '../../../store';
+import {validateSignInResponse, validateSignInBeforeRequest} from '../../../helpers';
+
 import {useStyles} from './styles';
 
 export function SignIn() {
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  const handleLogin = useCallback(() => {
-    // dispatch(tokenSet('123123123'));
-  }, [dispatch]);
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [error, setError] = useState<{ field: string, message: string } | null>(null);
+
+  const handleEmailChange = useCallback((event) => {
+    setEmail(event.target.value);
+  }, [setEmail]);
+  const handlePasswordChange = useCallback((event) => {
+    setPassword(event.target.value);
+  }, [setPassword]);
+
+  const handleSignIn = useCallback(async (e) => {
+    e.preventDefault();
+    const preSubmitError = validateSignInBeforeRequest(
+      email,
+      password,
+    );
+    setError(preSubmitError);
+    
+    if (!preSubmitError) {
+      try {
+        const res = await users.login(email, password);
+        console.log('login', res);
+        if (res.success) {
+          
+        } else {
+          if (res.error) {
+            const { code, message } = res.error;
+            const invalidField = validateSignInResponse(code);
+            if (invalidField) {
+              setError({
+                field: invalidField,
+                message,
+              });
+            }
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, [email, password, setError]);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -41,6 +83,10 @@ export function SignIn() {
             name="email"
             autoComplete="email"
             autoFocus
+            value={email}
+            onChange={handleEmailChange}
+            error={error && error.field === 'email' ? true : false}
+            helperText={error && error.field === 'email' ? error.message : ''}
           />
           <TextField
             variant="outlined"
@@ -52,6 +98,10 @@ export function SignIn() {
             type="password"
             id="password"
             autoComplete="current-password"
+            value={password}
+            onChange={handlePasswordChange}
+            error={error && error.field === 'password' ? true : false}
+            helperText={error && error.field === 'password' ? error.message : ''}
           />
           <Button
             type="submit"
@@ -59,7 +109,7 @@ export function SignIn() {
             variant="contained"
             color="primary"
             className={classes.submit}
-            onClick={handleLogin}
+            onClick={handleSignIn}
           >
             Sign In
           </Button>
