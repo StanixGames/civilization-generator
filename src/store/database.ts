@@ -1,8 +1,8 @@
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
-import {Nation} from '../types/Nation';
-import {UserShort} from '../types';
+// import {Nation} from '../types/Nation';
+import {UserShort, Nation} from '../types';
 
 firebase.initializeApp({
   apiKey: "AIzaSyBbcZSxy-K_LdSktzxdq04u1AnFbzUg4Fw",
@@ -174,17 +174,27 @@ class Users {
 }
 
 class Nations {
-  async getAll(): Promise<firebase.firestore.DocumentData[]> {
-    try {
-      const snapshot = await firebase
+  async getAll(): Promise<Nation[]> {
+    return new Promise((resolve) => {
+      firebase
         .firestore()
         .collection('nations')
-        .get();
-      return snapshot.docs.map(doc => doc.data());
-    } catch (e) {
-      console.log(e);
-      return [];
-    }
+        .get()
+        .then((snapshot) => {
+          const nations = snapshot.docs.map((doc) => {
+            const {coeff, key} = doc.data();
+            return {
+              name: key,
+              coeff,
+            }
+          });
+          resolve(nations);
+        })
+        .catch((e) => {
+          console.log(e);
+          resolve([]);
+        });
+    });
   }
 }
 
