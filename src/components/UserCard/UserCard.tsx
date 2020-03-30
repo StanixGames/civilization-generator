@@ -23,7 +23,7 @@ export const UserCard: React.FunctionComponent<UserCardProps> = (props): JSX.Ele
   return (
     <Card className={classes.card}>
       <CardActionArea onClick={onClick}>
-        <CardContent>
+        <CardContent className={classes.cardContent}>
           <Avatar alt={nickName} src={avatarUrl} className={classes.avatar} />
           <Typography gutterBottom variant="subtitle1" component="div">
             {nickName}

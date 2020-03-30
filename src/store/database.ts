@@ -2,7 +2,7 @@ import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
 // import {Nation} from '../types/Nation';
-import {UserShort, Nation} from '../types';
+import {UserShort, Nation, Draft} from '../types';
 
 firebase.initializeApp({
   apiKey: "AIzaSyBbcZSxy-K_LdSktzxdq04u1AnFbzUg4Fw",
@@ -198,5 +198,59 @@ class Nations {
   }
 }
 
+class Drafts {
+  // TODO: add promise all
+  async getAllByUserId(userId: string): Promise<Draft[]> {
+    return new Promise((resolve) => {
+      console.log('.')
+      firebase
+        .firestore()
+        .collection('users')
+        .doc(userId)
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            const userData = doc.data();
+            if (userData) {
+              const {drafts} = userData;
+              const draftList: Draft[] = [];
+              drafts.forEach((draftId: string) => {
+                firebase
+                  .firestore()
+                  .collection('drafts')
+                  .doc(draftId)
+                  .get()
+                  .then((draftDoc) => {
+                    if (draftDoc.exists) {
+                      const draftData = draftDoc.data();
+                      const {name, users} = draftData as Draft;
+                      draftList.push({
+                        name,
+                        users
+                      });
+                    }
+                  })
+                  .catch((e) => {
+                    console.log(e);
+                    resolve([]);
+                  })
+              });
+              resolve(draftList);
+            } else {
+              resolve([]);
+            }
+          } else {
+            resolve([]);
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+          resolve([]);
+        });
+    });
+  }
+}
+
 export const users = new Users();
 export const nations = new Nations();
+export const drafts = new Drafts();

@@ -24,6 +24,7 @@ import { mainListItems, secondaryListItems } from './listItems';
 import {Home} from './Home';
 import {Players} from './Players';
 import {Nations} from './Nations';
+import {Drafts} from './Drafts';
 import {CreateDraft} from './CreateDraft';
 
 import {usePageTitle, useUser} from '../../hooks';
@@ -210,6 +211,7 @@ export function User() {
             <Route exact path="/draft" component={CreateDraft} />
             <Route path="/players" component={Players} />
             <Route path="/nations" component={Nations} />
+            <Route path="/drafts" component={Drafts} />
             {/* <Route component={Page404} /> */}
         </Container>
       </main>

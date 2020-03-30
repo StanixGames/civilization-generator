@@ -8,7 +8,12 @@ export const useStyles = makeStyles(() => ({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  cardContent: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   avatar: {
-    marginBottom: 4,
+    marginRight: 6,
   }
 }));
