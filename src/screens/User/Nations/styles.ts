@@ -2,7 +2,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 export const useStyles = makeStyles((theme) => ({
   paper: {
-    marginTop: theme.spacing(2),
+    marginTop: 0,
     display: 'flex',
     flex: 1,
     flexDirection: 'row',
@@ -11,7 +11,21 @@ export const useStyles = makeStyles((theme) => ({
     flexWrap: 'wrap',
   },
   table: {
-    minWidth: 650,
+    minWidth: 300,
   },
-  
+  row: {
+    '&:hover': {
+      backgroundColor: 'rgba(0,0,0,0.03)'
+    }
+  },
+  ratingCell: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  updateButton: {
+    marginBottom: 20,
+    marginTop: 20,
+  }
 }));

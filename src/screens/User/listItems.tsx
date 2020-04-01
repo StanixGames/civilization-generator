@@ -34,6 +34,14 @@ export const mainListItems = (
         <ListItemText primary="Nations" />
       </ListItem>
     </Link>
+    <Link to="/drafts">
+      <ListItem button>
+        <ListItemIcon>
+          <PeopleIcon />
+        </ListItemIcon>
+        <ListItemText primary="Drafts" />
+      </ListItem>
+    </Link>
   </div>
 );
 

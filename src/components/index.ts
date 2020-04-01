@@ -6,3 +6,4 @@ export * from './ResultForm';
 export * from './NationLabel';
 export * from './PlayerNationsCard';
 export * from './UserCard';
+export * from './RatingStars';

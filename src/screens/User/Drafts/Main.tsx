@@ -25,7 +25,7 @@ export function Main() {
     drafts
       .getAllByUserId('airomad7@gmail.co')
       .then((draftList) => {
-        console.log('draftList',draftList)
+        console.log('draftList',draftList, draftList[0].users.length)
         setDraftList(draftList);
         setLoading(false);
       });
@@ -51,7 +51,7 @@ export function Main() {
                       {draft.name}
                     </TableCell>
                     <TableCell align="right">
-                      {draft.users.join(', ')}
+                      JSJJ{draft.users.length}
                     </TableCell>
                   </TableRow>
                 ))}

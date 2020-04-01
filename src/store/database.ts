@@ -3,6 +3,7 @@ import 'firebase/auth';
 import 'firebase/firestore';
 // import {Nation} from '../types/Nation';
 import {UserShort, Nation, Draft} from '../types';
+import {FBDraftModel, FBUserModel} from '../types/models';
 
 firebase.initializeApp({
   apiKey: "AIzaSyBbcZSxy-K_LdSktzxdq04u1AnFbzUg4Fw",
@@ -160,6 +161,68 @@ class Users {
     });
   }
 
+  async getUserAllRatings(email: string): Promise<Nation[]> {
+    return new Promise((resolve) => {
+      firebase
+        .firestore()
+        .collection(`users/${email}/ratings`)
+        .get()
+        .then((snapshot) => {
+          const ratingsList: Nation[] = [];
+          snapshot.forEach((doc) => {
+            ratingsList.push({
+              name: doc.id,
+              coeff: doc.data().rating,
+            });
+          });
+          resolve(ratingsList);
+        })
+        .catch((e) => {
+          console.log(e);
+          resolve([]);
+        });
+    });
+  }
+
+  async updateUserAllRatings(email: string, ratingsList: {nation: string, rating: number}[]): Promise<boolean> {
+    return new Promise((resolve) => {
+      const promises: Promise<boolean>[] = [];
+      ratingsList.forEach(({nation, rating}) => {
+        promises.push(this.updateUserRating(email, nation, rating));
+      });
+
+      Promise.all(promises)
+        .then((results) => {
+          if (results.filter((res) => !res).length === 0) {
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+          resolve(false);
+        })
+    });
+  }
+
+  async updateUserRating(email: string, nation: string, rating: number): Promise<boolean> {
+    return new Promise((resolve) => {
+      firebase
+        .firestore()
+        .collection(`users/${email}/ratings`)
+        .doc(nation)
+        .set({rating})
+        .then(() => {
+          resolve(true);
+        })
+        .catch((e) => {
+          console.log(e);
+          resolve(false);
+        });
+    });
+  }
+
   async getSize(): Promise<number> {
     try {
       const {size} = await db
@@ -213,29 +276,22 @@ class Drafts {
             const userData = doc.data();
             if (userData) {
               const {drafts} = userData;
-              const draftList: Draft[] = [];
+              const draftPromises: Promise<Draft | null>[] = [];
+
               drafts.forEach((draftId: string) => {
-                firebase
-                  .firestore()
-                  .collection('drafts')
-                  .doc(draftId)
-                  .get()
-                  .then((draftDoc) => {
-                    if (draftDoc.exists) {
-                      const draftData = draftDoc.data();
-                      const {name, users} = draftData as Draft;
-                      draftList.push({
-                        name,
-                        users
-                      });
-                    }
-                  })
-                  .catch((e) => {
-                    console.log(e);
-                    resolve([]);
-                  })
+                draftPromises.push(
+                  this.getDraftById(draftId)
+                );
               });
-              resolve(draftList);
+
+              Promise.all(draftPromises)
+                .then((data) => {
+                  const draftList: Draft[] = data.filter((it) => it !== null) as any;
+                  resolve(draftList);
+                })
+                .catch((e) => {
+                  resolve([]);
+                });
             } else {
               resolve([]);
             }
@@ -246,6 +302,55 @@ class Drafts {
         .catch((e) => {
           console.log(e);
           resolve([]);
+        });
+    });
+  }
+
+  async getDraftById(draftId: string): Promise<Draft | null> {
+    return new Promise((resolve) => {
+      firebase
+        .firestore()
+        .collection('drafts')
+        .doc(draftId)
+        .get()
+        .then((draftDoc) => {
+          if (draftDoc.exists) {
+            const draftData = draftDoc.data();
+            const {name, users} = draftData as FBDraftModel;
+            const usersData: { accepted: boolean; user: UserShort}[] = [];
+
+            users.forEach(async (userData) => {
+              console.log(userData);
+              if (userData.userRef) {
+                try {
+                  const doc = await userData.userRef.get();
+                  if (doc.exists) {
+                    console.log('user doc', doc.data());
+                    const {nickName, avatarUrl} = doc.data() as FBUserModel;
+                    usersData.push({
+                      accepted: userData.accepted,
+                      user: {
+                        id: doc.id,
+                        nickName,
+                        avatarUrl,
+                      }
+                    });
+                  }
+                } catch (e) {
+                  console.log(e);
+                }
+              }
+            });
+
+            resolve({
+              name,
+              users: usersData,
+            });
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+          resolve(null);
         });
     });
   }
